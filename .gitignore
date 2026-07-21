@@ -1,0 +1,23 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Streamlit configs
+.streamlit/
+
+# Terraform binaries and state files
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# macOS system files
+.DS_Store

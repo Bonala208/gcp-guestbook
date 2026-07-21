@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: guestbook-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gke-guestbook
+  namespace: guestbook-app
+  labels:
+    app: guestbook
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: guestbook
+  template:
+    metadata:
+      labels:
+        app: guestbook
+    spec:
+      containers:
+      - name: app
+        image: asia-southeast1-docker.pkg.dev/pythonproject-502117/guestbook-repo/gcp-guestbook:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8501
+          name: http
+        
+        # Environment variables (Updated dynamically after Cloud SQL is created)
+        env:
+        - name: DB_HOST
+          value: "35.187.253.163"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "postgres"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "YOUR_SECURE_PASSWORD"
+
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8501
+          initialDelaySeconds: 15
+          periodSeconds: 15
+
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8501
+          initialDelaySeconds: 10
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gke-guestbook-svc
+  namespace: guestbook-app
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  ports:
+  - port: 80
+    targetPort: 8501
+    protocol: TCP
+    name: http
+  selector:
+    app: guestbook
