@@ -21,6 +21,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # DevSecOps Step: Free Open-Source Python SAST Scan (Bandit)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install & Run Bandit SAST Scanner
+        run: |-
+          pip install bandit
+          bandit -r app.py -f txt || true
+
       # 1. Authenticate to Google Cloud
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
