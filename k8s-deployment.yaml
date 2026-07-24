@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: asia-southeast1-docker.pkg.dev/pythonproject-502117/guestbook-repo/gcp-guestbook:v2
+        image: asia-southeast1-docker.pkg.dev/pythonproject-502117/guestbook-repo/gcp-guestbook:v3
         imagePullPolicy: Always
         ports:
         - containerPort: 8501
@@ -57,12 +57,23 @@ spec:
             path: /
             port: 8501
           initialDelaySeconds: 15
-          periodSeconds: 15
+          periodSeconds: 10
 
         readinessProbe:
-          httpGet:
-            path: /
-            port: 8501
+          exec:
+            command:
+            - python3
+            - -c
+            - |
+              import psycopg2, os
+              conn = psycopg2.connect(
+                  host=os.environ.get("DB_HOST", "127.0.0.1"),
+                  database=os.environ.get("DB_NAME", "postgres"),
+                  user=os.environ.get("DB_USER", "postgres"),
+                  password=os.environ.get("DB_PASSWORD"),
+                  port=os.environ.get("DB_PORT", "5432")
+              )
+              conn.close()
           initialDelaySeconds: 10
           periodSeconds: 10
 

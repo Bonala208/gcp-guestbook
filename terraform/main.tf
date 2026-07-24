@@ -53,7 +53,8 @@ resource "google_container_cluster" "primary" {
   name                = "guestbook-cluster"
   location            = var.zone
   initial_node_count  = 2
-  min_master_version  = "1.33.12-gke.1059000"
+  min_master_version  = "1.34.8-gke.1278000"
+  node_version        = "1.34.8-gke.1278000"
   deletion_protection = false
 
   node_config {

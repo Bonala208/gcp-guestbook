@@ -4,6 +4,13 @@ import os
 from collections import Counter
 from datetime import datetime
 
+# Create liveness health check file on container startup
+try:
+    with open("/tmp/healthy", "w") as f:
+        f.write("ok")
+except Exception:
+    pass
+
 # Set page configuration
 st.set_page_config(page_title="GCP Cloud Guestbook", page_icon="📝", layout="wide")
 
