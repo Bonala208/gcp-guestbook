@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: asia-southeast1-docker.pkg.dev/pythonproject-502117/guestbook-repo/gcp-guestbook:v1
+        image: asia-southeast1-docker.pkg.dev/pythonproject-502117/guestbook-repo/gcp-guestbook:v2
         imagePullPolicy: Always
         ports:
         - containerPort: 8501
@@ -31,7 +31,7 @@ spec:
         # Environment variables (Updated dynamically after Cloud SQL is created)
         env:
         - name: DB_HOST
-          value: "35.187.253.163"
+          value: "127.0.0.1"
         - name: DB_PORT
           value: "5432"
         - name: DB_NAME
@@ -39,12 +39,15 @@ spec:
         - name: DB_USER
           value: "postgres"
         - name: DB_PASSWORD
-          value: "YOUR_SECURE_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: db-password
 
         resources:
           requests:
             memory: "256Mi"
-            cpu: "200m"
+            cpu: "50m"
           limits:
             memory: "512Mi"
             cpu: "500m"
@@ -62,6 +65,20 @@ spec:
             port: 8501
           initialDelaySeconds: 10
           periodSeconds: 10
+
+      # 2. The Cloud SQL Auth Proxy Sidecar Container
+      - name: cloud-sql-proxy
+        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.0
+        args:
+          - "--port=5432"
+          - "pythonproject-502117:asia-southeast1:guestbook-db-instance"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "10m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
 ---
 apiVersion: v1
 kind: Service

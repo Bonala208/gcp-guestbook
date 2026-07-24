@@ -13,7 +13,7 @@ variable "region" {
 variable "zone" {
   description = "GCP Zone"
   type        = string
-  default     = "asia-southeast1-a"
+  default     = "asia-southeast1-b"
 }
 
 variable "db_password" {

@@ -1,8 +1,7 @@
 import streamlit as st
-import pandas as pd
 import psycopg2
 import os
-import matplotlib.pyplot as plt
+from collections import Counter
 from datetime import datetime
 
 # Set page configuration
@@ -50,15 +49,15 @@ def init_db():
 # Run database initialization
 init_db()
 
-# Helper function to load data
+# Helper function to load data (No Pandas Dependency)
 def load_messages():
     conn = get_db_connection()
     try:
-        df = pd.read_sql(
-            "SELECT visitor_name AS \"Visitor\", message AS \"Message\", sentiment AS \"Sentiment\", created_at AS \"Posted At\" FROM guestbook ORDER BY created_at DESC",
-            conn
-        )
-        return df
+        cur = conn.cursor()
+        cur.execute("SELECT visitor_name, message, sentiment, created_at FROM guestbook ORDER BY created_at DESC")
+        rows = cur.fetchall()
+        cur.close()
+        return rows
     finally:
         conn.close()
 
@@ -107,41 +106,34 @@ with col1:
 with col2:
     st.header("Guestbook Entries & Analytics")
     try:
-        df = load_messages()
+        messages = load_messages()
         
-        if df.empty:
+        if not messages:
             st.info("No messages have been left yet. Be the first to write a message on the left!")
         else:
             # 1. Analytics & Metrics
-            total_messages = len(df)
-            unique_visitors = df["Visitor"].nunique()
+            total_messages = len(messages)
+            unique_visitors = len(set([row[0] for row in messages]))
             
             m_col1, m_col2 = st.columns(2)
             m_col1.metric("Total Messages", total_messages)
             m_col2.metric("Unique Visitors", unique_visitors)
             
-            # 2. Charts Section
+            # 2. Charts Section (Native JS Streamlit Chart)
             st.subheader("Visitor Sentiments")
-            sentiment_counts = df["Sentiment"].value_counts()
+            sentiments = [row[2] for row in messages]
+            sentiment_counts = dict(Counter(sentiments))
             
-            fig, ax = plt.subplots(figsize=(5, 3))
-            fig.patch.set_facecolor('#0e1117')
-            ax.set_facecolor('#0e1117')
+            # Render a clean native interactive bar chart (No Matplotlib required!)
+            st.bar_chart(sentiment_counts)
             
-            # Draw Pie Chart
-            wedges, texts, autotexts = ax.pie(
-                sentiment_counts,
-                labels=sentiment_counts.index,
-                autopct='%1.1f%%',
-                startangle=140,
-                textprops=dict(color="w")
-            )
-            plt.setp(autotexts, size=8, weight="bold")
-            st.pyplot(fig)
-            
-            # 3. Log Table
+            # 3. Log Timeline
             st.subheader("Messages Log")
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            for visitor_name, message, sentiment, created_at in messages:
+                st.markdown(f"👤 **{visitor_name}** *(Sentiment: {sentiment})*")
+                st.caption(f"Posted on {created_at.strftime('%Y-%m-%d %H:%M')}")
+                st.write(message)
+                st.markdown("---")
             
     except Exception as e:
         st.warning("Database connection is not configured or offline. Set your DB_HOST environment variables to connect.")

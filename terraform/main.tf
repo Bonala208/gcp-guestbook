@@ -36,12 +36,6 @@ resource "google_sql_database_instance" "postgres_instance" {
 
     ip_configuration {
       ipv4_enabled = true
-
-      # Authorize all IPs temporarily for GKE connection testing
-      authorized_networks {
-        name  = "allow-all"
-        value = "0.0.0.0/0"
-      }
     }
   }
 }
@@ -55,11 +49,12 @@ resource "google_sql_user" "root_user" {
 
 # 4. Create GKE Standard Zonal Cluster (2 nodes)
 resource "google_container_cluster" "primary" {
-  depends_on       = [google_project_service.container_api]
-  name             = "guestbook-cluster"
-  location         = var.zone
-  initial_node_count = 2
-  min_master_version = "1.33.12-gke.1059000"
+  depends_on          = [google_project_service.container_api]
+  name                = "guestbook-cluster"
+  location            = var.zone
+  initial_node_count  = 2
+  min_master_version  = "1.33.12-gke.1059000"
+  deletion_protection = false
 
   node_config {
     machine_type = "e2-medium"
