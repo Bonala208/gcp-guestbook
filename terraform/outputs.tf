@@ -12,3 +12,5 @@ output "cloud_sql_public_ip" {
   description = "Public IP Address of Cloud SQL Instance"
   value       = google_sql_database_instance.postgres_instance.public_ip_address
 }
+
+
