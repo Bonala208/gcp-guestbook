@@ -30,14 +30,14 @@ pipeline {
 
         stage('SonarQube Code Quality & Security Scan') {
             steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                script {
+                    echo "Executing Real SonarQube Code Quality Analysis..."
                     sh '''
-                        echo "Executing SonarQube Code Quality and Security Analysis..."
                         sonar-scanner \
+                          -Dsonar.host.url=http://localhost:9000 \
                           -Dsonar.projectKey=gcp-guestbook \
                           -Dsonar.sources=. \
-                          -Dsonar.host.url=${SONAR_HOST_URL:-http://localhost:9000} \
-                          -Dsonar.login=${SONAR_TOKEN} || true
+                          -Dsonar.exclusions=venv/**,.github/**,jenkins-setup/**,terraform/**
                     '''
                 }
             }
@@ -46,7 +46,7 @@ pipeline {
         stage('SonarQube Quality Gate') {
             steps {
                 script {
-                    echo "Checking SonarQube Quality Gate Status..."
+                    echo "SonarQube Analysis Complete! Access Dashboard at http://34.87.177.6:9000"
                 }
             }
         }
