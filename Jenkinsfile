@@ -45,8 +45,20 @@ pipeline {
 
         stage('SonarQube Quality Gate') {
             steps {
-                script {
-                    echo "SonarQube Analysis Complete! Access Dashboard at http://34.87.177.6:9000"
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        echo "Querying SonarQube Quality Gate Status for project 'gcp-guestbook'..."
+                        STATUS=$(curl -s -u $SONAR_TOKEN: "http://localhost:9000/api/qualitygates/project_status?projectKey=gcp-guestbook" | python3 -c "import sys, json; print(json.load(sys.stdin)['projectStatus']['status'])")
+                        
+                        echo "--------------------------------------------------"
+                        echo "SonarQube Quality Gate Result: $STATUS"
+                        echo "--------------------------------------------------"
+                        
+                        if [ "$STATUS" != "OK" ]; then
+                            echo "ERROR: SonarQube Quality Gate FAILED! Aborting deployment."
+                            exit 1
+                        fi
+                    '''
                 }
             }
         }
