@@ -21,9 +21,9 @@ pipeline {
         stage('DevSecOps SAST Scan (Bandit)') {
             steps {
                 sh '''
-                    python3 -m pip install --upgrade pip || true
-                    pip install bandit || true
-                    bandit -r app.py -f txt || true
+                    export PATH=$HOME/.local/bin:$PATH
+                    python3 -m pip install --user --upgrade bandit
+                    bandit -r app.py -f txt
                 '''
             }
         }
