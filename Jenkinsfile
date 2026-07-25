@@ -30,11 +30,11 @@ pipeline {
 
         stage('SonarQube Code Quality & Security Scan') {
             steps {
-                script {
-                    echo "Executing Real SonarQube Code Quality Analysis..."
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                     sh '''
                         sonar-scanner \
                           -Dsonar.host.url=http://localhost:9000 \
+                          -Dsonar.token=$SONAR_TOKEN \
                           -Dsonar.projectKey=gcp-guestbook \
                           -Dsonar.sources=. \
                           -Dsonar.exclusions=venv/**,.github/**,jenkins-setup/**,terraform/**
