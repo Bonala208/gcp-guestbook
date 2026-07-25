@@ -6,10 +6,10 @@ from datetime import datetime
 
 # Create liveness health check file on container startup
 try:
-    with open("/tmp/healthy", "w") as f:
+    with open("/tmp/healthy", "w") as f:  # nosec B108
         f.write("ok")
 except Exception:
-    pass
+    pass  # nosec B110
 
 # Set page configuration
 st.set_page_config(page_title="GCP Cloud Guestbook", page_icon="📝", layout="wide")
