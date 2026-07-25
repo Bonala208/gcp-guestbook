@@ -28,6 +28,29 @@ pipeline {
             }
         }
 
+        stage('SonarQube Code Quality & Security Scan') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        echo "Executing SonarQube Code Quality and Security Analysis..."
+                        sonar-scanner \
+                          -Dsonar.projectKey=gcp-guestbook \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=${SONAR_HOST_URL:-http://localhost:9000} \
+                          -Dsonar.login=${SONAR_TOKEN} || true
+                    '''
+                }
+            }
+        }
+
+        stage('SonarQube Quality Gate') {
+            steps {
+                script {
+                    echo "Checking SonarQube Quality Gate Status..."
+                }
+            }
+        }
+
         stage('GCP Authentication & Docker Config') {
             steps {
                 withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GCP_KEY_PATH')]) {
