@@ -17,9 +17,9 @@ variable "zone" {
 }
 
 variable "machine_type" {
-  description = "GCE Machine Type for Jenkins Server"
+  description = "GCP Compute Engine Machine Type"
   type        = string
-  default     = "e2-medium"
+  default     = "e2-standard-4" # 4 vCPUs, 16 GB RAM for Jenkins & SonarQube
 }
 
 variable "credentials_file" {

@@ -15,7 +15,7 @@ except Exception:
 st.set_page_config(page_title="GCP Cloud Guestbook", page_icon="📝", layout="wide")
 
 # Page headers
-st.title("📝 GCP Cloud Guestbook and Message Board")
+st.title("📝 GCP Cloud Guestbook & Message Board")
 st.markdown("A simple message board to record visitor comments and visualize sentiments in real-time.")
 
 # Database connection credentials from environment

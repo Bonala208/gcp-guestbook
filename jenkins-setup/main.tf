@@ -1,11 +1,11 @@
-# 1. Create Firewall Rule for Jenkins Port 8080
+# 1. Create Firewall Rule for Jenkins (8080) and SonarQube (9000)
 resource "google_compute_firewall" "allow_jenkins" {
   name    = "allow-jenkins-8080"
   network = "default"
 
   allow {
     protocol = "tcp"
-    ports    = ["8080"]
+    ports    = ["8080", "9000"]
   }
 
   target_tags   = ["jenkins-server"]
@@ -54,8 +54,9 @@ usermod -aG docker jenkins
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
-# Open RHEL OS Firewall for Port 8080
+# Open RHEL OS Firewall for Port 8080 and Port 9000 (SonarQube)
 firewall-cmd --permanent --add-port=8080/tcp || true
+firewall-cmd --permanent --add-port=9000/tcp || true
 firewall-cmd --reload || true
 EOF
 }
