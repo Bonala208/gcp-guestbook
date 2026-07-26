@@ -21,7 +21,7 @@ resource "google_compute_instance" "jenkins_vm" {
 
   boot_disk {
     initialize_params {
-      image = "rhel-cloud/rhel-8" # RHEL 8 OS
+      image = "rhel-cloud/rhel-8" # N-1/N-2 OS Version
       size  = 20
     }
   }
@@ -58,5 +58,52 @@ install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 firewall-cmd --permanent --add-port=8080/tcp || true
 firewall-cmd --permanent --add-port=9000/tcp || true
 firewall-cmd --reload || true
+EOF
+}
+
+# 3. Create Dedicated Jenkins Worker Agent VM (rhel-agent)
+resource "google_compute_instance" "jenkins_agent" {
+  name         = "jenkins-rhel-agent"
+  machine_type = var.agent_machine_type
+  zone         = var.zone
+  tags         = ["jenkins-server"]
+
+  boot_disk {
+    initialize_params {
+      image = "rhel-cloud/rhel-8"
+      size  = 20
+    }
+  }
+
+  network_interface {
+    network = "default"
+    access_config {
+      // Ephemeral public IP
+    }
+  }
+
+  metadata_startup_script = <<EOF
+#!/bin/bash
+dnf update -y
+dnf install -y java-21-openjdk git curl wget dnf-plugins-core python39 google-cloud-sdk-gke-gcloud-auth-plugin unzip
+alternatives --set python3 /usr/bin/python3.9
+
+# Install Docker
+dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+dnf install -y docker-ce docker-ce-cli containerd.io
+systemctl enable --now docker
+
+# Create jenkins user for agent SSH connection
+useradd -m -s /bin/bash jenkins || true
+usermod -aG docker jenkins
+
+# Install kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+# Install sonar-scanner CLI
+curl -LO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+unzip -q sonar-scanner-cli-5.0.1.3006-linux.zip -d /opt/
+ln -sf /opt/sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner /usr/local/bin/sonar-scanner
 EOF
 }

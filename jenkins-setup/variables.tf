@@ -27,3 +27,9 @@ variable "credentials_file" {
   type        = string
   default     = "~/gcp-key.json"
 }
+
+variable "agent_machine_type" {
+  description = "GCP Compute Engine Machine Type for Jenkins Worker Agent VM"
+  type        = string
+  default     = "e2-standard-4" # 4 vCPUs, 16 GB RAM for build workloads
+}

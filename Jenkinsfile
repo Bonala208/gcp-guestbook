@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'rhel-agent' }
 
     environment {
         PROJECT_ID    = 'guestbook-503604'
