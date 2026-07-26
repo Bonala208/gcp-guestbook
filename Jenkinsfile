@@ -1,5 +1,22 @@
 pipeline {
-    agent { label 'rhel-agent' }
+    agent {
+        kubernetes {
+            yaml '''
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: jenkins-gke-agent
+spec:
+  containers:
+  - name: devsecops-agent
+    image: python:3.11-slim
+    command:
+    - cat
+    tty: true
+'''
+        }
+    }
 
     environment {
         PROJECT_ID    = 'guestbook-503604'
