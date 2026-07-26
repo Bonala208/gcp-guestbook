@@ -37,7 +37,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                     sh '''
                         sonar-scanner \
-                          -Dsonar.host.url=http://localhost:9000 \
+                          -Dsonar.host.url=http://136.85.111.72:9000 \
                           -Dsonar.token=$SONAR_TOKEN \
                           -Dsonar.projectKey=gcp-guestbook \
                           -Dsonar.sources=. \
@@ -52,7 +52,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                     sh '''
                         echo "Querying SonarQube Quality Gate Status for project 'gcp-guestbook'..."
-                        STATUS=$(curl -s -u $SONAR_TOKEN: "http://localhost:9000/api/qualitygates/project_status?projectKey=gcp-guestbook" | python3 -c "import sys, json; print(json.load(sys.stdin)['projectStatus']['status'])")
+                        STATUS=$(curl -s -u $SONAR_TOKEN: "http://136.85.111.72:9000/api/qualitygates/project_status?projectKey=gcp-guestbook" | python3 -c "import sys, json; print(json.load(sys.stdin)['projectStatus']['status'])")
                         
                         echo "--------------------------------------------------"
                         echo "SonarQube Quality Gate Result: $STATUS"
