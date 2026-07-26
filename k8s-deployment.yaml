@@ -82,7 +82,7 @@ spec:
         image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.0
         args:
           - "--port=5432"
-          - "pythonproject-502117:asia-southeast1:guestbook-db-instance"
+          - "guestbook-503604:asia-southeast1:guestbook-db-instance"
         resources:
           requests:
             memory: "128Mi"

@@ -11,6 +11,10 @@ pipeline {
         IMAGE_TAG     = "${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:${BUILD_NUMBER}"
     }
 
+    triggers {
+        pollSCM('H/2 * * * *') // Backup automated poll every 2 minutes
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
