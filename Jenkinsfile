@@ -9,7 +9,7 @@ metadata:
     component: jenkins-gke-agent
 spec:
   containers:
-  - name: devsecops-agent
+  - name: python
     image: python:3.11-slim
     command:
     - cat
@@ -41,11 +41,13 @@ spec:
 
         stage('DevSecOps SAST Scan (Bandit)') {
             steps {
-                sh '''
-                    export PATH=$HOME/.local/bin:$PATH
-                    python3 -m pip install --user --upgrade bandit
-                    bandit -r app.py -f txt
-                '''
+                container('python') {
+                    sh '''
+                        python3 -m pip install --user --upgrade bandit
+                        export PATH=$HOME/.local/bin:$PATH
+                        bandit -r app.py -f txt
+                    '''
+                }
             }
         }
 
