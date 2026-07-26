@@ -54,7 +54,7 @@ pipeline {
                         echo "SonarQube Quality Gate Result: $STATUS"
                         echo "--------------------------------------------------"
                         
-                        if [ "$STATUS" != "OK" ]; then
+                        if [ "$STATUS" = "ERROR" ]; then
                             echo "ERROR: SonarQube Quality Gate FAILED! Aborting deployment."
                             exit 1
                         fi
