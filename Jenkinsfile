@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PROJECT_ID    = 'pythonproject-502117'
+        PROJECT_ID    = 'guestbook-503604'
         GAR_LOCATION  = 'asia-southeast1'
         GKE_CLUSTER   = 'guestbook-cluster'
         GKE_ZONE      = 'asia-southeast1-b'

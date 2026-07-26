@@ -1,7 +1,7 @@
 variable "project_id" {
   description = "The GCP Project ID"
   type        = string
-  default     = "pythonproject-502117"
+  default     = "guestbook-503604"
 }
 
 variable "region" {

@@ -21,7 +21,7 @@ resource "google_compute_instance" "jenkins_vm" {
 
   boot_disk {
     initialize_params {
-      image = "rhel-cloud/rhel-8" # N-1/N-2 OS Version
+      image = "rhel-cloud/rhel-8" # RHEL 8 OS
       size  = 20
     }
   }
