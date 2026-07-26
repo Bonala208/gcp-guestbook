@@ -17,6 +17,19 @@ spec:
     image: google/cloud-sdk:latest
     command: ['cat']
     tty: true
+  - name: docker
+    image: docker:24.0.7-cli
+    command: ['cat']
+    tty: true
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: docker-sock
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
 '''
         }
     }
@@ -99,13 +112,19 @@ spec:
             }
         }
 
-        stage('GCP Authentication & Docker Config') {
+        stage('Build & Push Docker Image (GCP Cloud Build)') {
             steps {
                 container('gcloud') {
                     withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GCP_KEY_PATH')]) {
                         sh '''
                             gcloud auth activate-service-account --key-file=$GCP_KEY_PATH
                             gcloud config set project $PROJECT_ID
+                            
+                            # Submit build to GCP Artifact Registry
+                            gcloud builds submit \
+                                --tag ${IMAGE_TAG} \
+                                --tag ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:latest \
+                                .
                         '''
                     }
                 }
