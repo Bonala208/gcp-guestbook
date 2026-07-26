@@ -1,5 +1,6 @@
 FROM python:3.11-slim
 
+# Workdir of the docker container
 WORKDIR /app
 
 # Install build dependencies
